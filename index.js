@@ -1,11 +1,31 @@
 'use strict';
 const http = require('http');
 const server = http.createServer((req, res) => {
-	console.info('[' + new Date() + '] Requested by ' + req.connection.remoteAddress);
+	const now = new Date();
+	console.info('[' + now + '] Requested by' + req.connection.remoteAddress )
 	res.writeHead(200, {
 		'Content-Type': 'text/plain; charset=utf-8'
 	});
-	res.write(req.headers['user-agent']);
+	switch(req.method){
+		case 'GET':
+			res.write('GET ' + req.url + '\n');
+			break;
+		case 'POST':
+			res.write('POST ' + req.url + '\n');
+			let body = "";
+		req.on('data', (chunk) => {
+			body += chunk;
+		}).on('end', () => {
+			console.log(body);
+			console.info('[' + now + '] Data posted: ' + body);
+		})
+		break;
+	case 'DELETE':
+			res.write('DELETE ' + req.url + '\n');
+			break;
+	default:
+		break;
+	}
 	res.end();
 }).on('error', (e) => {
 	console.error('[' + new Date() + '] Server Error', e);
